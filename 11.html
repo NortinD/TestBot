@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON SUSHI 3000 | Квантовая доставка</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Глобальные стили */
+        :root {
+            --neon-pink: #ff2a6d;
+            --neon-cyan: #00f7ff;
+            --neon-purple: #d300c5;
+            --neon-green: #00ff9d;
+            --dark-matrix: #0a0a12;
+            --darker-void: #050510;
+            --text-glow: #d1f7ff;
+            --neon-glow: 0 0 15px;
+            --matrix-flicker: 0 0 5px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --cyber-font: 'Orbitron', 'Rajdhani', sans-serif;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--cyber-font);
+        }
+        
+        body {
+            background-color: var(--dark-matrix);
+            color: var(--text-glow);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 42, 109, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 90% 80%, rgba(0, 247, 255, 0.1) 0%, transparent 25%),
+                linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(10,10,18,1) 100%);
+            background-attachment: fixed;
+        }
+        
+        /* ASCII арт лоадер */
+        .cyber-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-void);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--neon-green);
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.3;
+            overflow: hidden;
+        }
+        
+        .loader-grid {
+            display: grid;
+            grid-template-columns: repeat(40, 1fr);
+            gap: 0;
+            margin-bottom: 30px;
+        }
+        
+        .loader-cell {
+            width: 12px;
+            height: 12px;
+            background: rgba(0, 255, 157, 0.05);
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .loader-cell.active {
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: cellPulse 1.5s infinite alternate;
+        }
+        
+        .loader-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .loader-progress {
+            width: 300px;
+            height: 4px;
+            background: rgba(0, 247, 255, 0.1);
+            margin-top: 30px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-pink);
+            transition: width 0.5s ease;
+        }
+        
+        /* Шапка с голограммой */
+        header {
+            background-color: rgba(10, 10, 18, 0.95);
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            transition: var(--transition);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--neon-cyan);
+            border-image: linear-gradient(90deg, transparent, var(--neon-cyan), transparent) 1;
+        }
+        
+        .header-scrolled {
+            padding: 10px 0;
+            box-shadow: 0 0 40px rgba(255, 42, 109, 0.3);
+            border-bottom: 1px solid var(--neon-pink);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .logo-holo {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 247, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(15px);
+            animation: holoPulse 4s infinite alternate;
+            z-index: -1;
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 15px var(--neon-pink)) 
+                    hue-rotate(0deg);
+            animation: logoHue 8s infinite linear;
+            transition: var(--transition);
+        }
+        
+        .logo:hover img {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 42, 109, 0.5);
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        .logo-text::after {
+            content: 'v3.0.0';
+            position: absolute;
+            bottom: -15px;
+            right: 0;
+            font-size: 10px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 40px;
+            position: relative;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-glow);
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+        
+        nav ul li a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
+        }
+        
+        nav ul li a::before {
+            content: '>';
+            position: absolute;
+            left: -15px;
+            opacity: 0;
+            color: var(--neon-green);
+            transition: var(--transition);
+        }
+        
+        nav ul li a:hover::before {
+            opacity: 1;
+            left: -10px;
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            bottom: 0;
+            left: 0;
+            transition: var(--transition);
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+        
+        .order-btn {
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.5);
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .order-btn:hover {
+            box-shadow: 0 0 30px rgba(255, 42, 109, 0.8);
+            transform: translateY(-5px) scale(1.05);
+            animation: btnPulse 1.5s infinite;
+        }
+        
+        .order-btn i {
+            margin-right: 12px;
+            filter: drop-shadow(0 0 5px white);
+            font-size: 16px;
+        }
+        
+        .order-btn .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--neon-green);
+            color: var(--dark-matrix);
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: badgePulse 2s infinite;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            text-shadow: 0 0 15px var(--neon-cyan);
+            transition: var(--transition);
+        }
+        
+        .mobile-menu-btn:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
+        }
+        
+        /* Главный баннер с матрицей */
+        .hero {
+            height: 100vh;
+            background: 
+                linear-gradient(rgba(10, 10, 18, 0.7), rgba(10, 10, 18, 0.9)),
+                url('https://images.unsplash.com/photo-1561758033-d89a9ad46330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+        
+        .matrix-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1.5s ease;
+        }
+        
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 247, 255, 0.5);
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .hero h1::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px rgba(209, 247, 255, 0.5);
+            letter-spacing: 1px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        
+        .hero p::before,
+        .hero p::after {
+            content: '"';
+            color: var(--neon-green);
+            font-size: 2rem;
+            position: absolute;
+        }
+        
+        .hero p::before {
+            top: -15px;
+            left: -25px;
+        }
+        
+        .hero p::after {
+            bottom: -25px;
+            right: -25px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 60px;
+        }
+        
+        .phone-btn {
+            background: rgba(0, 247, 255, 0.15);
+            color: var(--neon-cyan);
+            padding: 20px 45px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            font-size: 16px;
+        }
+        
+        .phone-btn:hover {
+            background: rgba(0, 247, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.6);
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .phone-btn i {
+            margin-right: 15px;
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
+            font-size: 20px;
+        }
+        
+        .phone-btn .pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(0, 247, 255, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            animation: pulseAnim 2s infinite;
+        }
+        
+        .tg-btn {
+            background: rgba(255, 42, 109, 0.15);
+            color: var(--neon-pink);
+            padding: 20px 45px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            font-size: 16px;
+        }
+        
+        .tg-btn:hover {
+            background: rgba(255, 42, 109, 0.3);
+            box-shadow: 0 0 30px rgba(255, 42, 109, 0.6);
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .tg-btn i {
+            margin-right: 15px;
+            filter: drop-shadow(0 0 8px var(--neon-pink));
+            font-size: 20px;
+        }
+        
+        .tg-btn .ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(255, 42, 109, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            animation: rippleAnim 3s infinite;
+        }
+        
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--neon-green);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        
+        .scroll-down:hover {
+            opacity: 1;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .scroll-down i {
+            margin-top: 10px;
+            font-size: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        /* Секция "Меню" с голографической проекцией */
+        .menu-section {
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+            background: 
+                linear-gradient(to bottom, var(--dark-matrix) 0%, var(--darker-void) 100%);
+        }
+        
+        .menu-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 70% 30%, rgba(0, 247, 255, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(255, 42, 109, 0.05) 0%, transparent 30%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .holo-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(0, 247, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 247, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title h2 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            display: inline-block;
+            position: relative;
+            font-weight: 700;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--neon-pink);
+            animation: linePulse 3s infinite alternate;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-top: 30px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 50px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .menu-item {
+            background: rgba(10, 10, 18, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.1);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(0, 247, 255, 0.2);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 
+                0 0 40px rgba(255, 42, 109, 0.4),
+                0 0 80px rgba(0, 247, 255, 0.3);
+            border-color: var(--neon-pink);
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, 
+                    transparent, 
+                    rgba(255, 42, 109, 0.05), 
+                    transparent);
+            z-index: -1;
+        }
+        
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple));
+            z-index: -2;
+            filter: blur(20px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .menu-item:hover::after {
+            opacity: 0.5;
+        }
+        
+        .menu-item-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            filter: sepia(50%) hue-rotate(-20deg) contrast(120%);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .menu-item:hover .menu-item-img {
+            filter: sepia(0%) hue-rotate(0deg) contrast(130%);
+        }
+        
+        .menu-item-content {
+            padding: 30px;
+            position: relative;
+        }
+        
+        .menu-item-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .menu-item-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        .menu-item-title span:first-child {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--text-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .menu-item-price {
+            color: var(--neon-pink);
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--neon-pink);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item-desc {
+            color: #a0b0b8;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.7;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .tech-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .tech-spec {
+            background: rgba(0, 247, 255, 0.1);
+            color: var(--neon-cyan);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--neon-cyan);
+        }
+        
+        .order-methods {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed rgba(255, 42, 109, 0.3);
+            padding-top: 20px;
+        }
+        
+        .order-via {
+            font-size: 0.9rem;
+            color: #6a7b85;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .neon-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 10, 18, 0.9);
+            color: var(--neon-green);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
+            animation: badgeFloat 3s infinite ease-in-out;
+            z-index: 2;
+        }
+        
+        /* Секция "Как заказать" с терминалом */
+        .how-to-order {
+            padding: 120px 0;
+            background: var(--darker-void);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .how-to-order::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, 
+                    transparent, 
+                    rgba(0, 247, 255, 0.05), 
+                    transparent);
+            z-index: 0;
+        }
+        
+        .terminal {
+            background: rgba(10, 10, 18, 0.8);
+            border-radius: 10px;
+            padding: 40px;
+            margin-top: 60px;
+            position: relative;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 
+                0 0 30px rgba(0, 247, 255, 0.2),
+                inset 0 0 20px rgba(0, 247, 255, 0.1);
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
+        }
+        
+        .terminal-dots {
+            display: flex;
+            gap: 10px;
+            margin-right: 20px;
+        }
+        
+        .terminal-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+        
+        .terminal-dot.red {
+            background: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .terminal-dot.yellow {
+            background: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .terminal-dot.green {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .terminal-title {
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1rem;
+        }
+        
+        .terminal-body {
+            color: var(--neon-green);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .terminal-command {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .terminal-prompt {
+            color: var(--neon-purple);
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: var(--neon-cyan);
+            margin-left: 5px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        .terminal-output {
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .terminal-output.success {
+            color: var(--neon-green);
+        }
+        
+        .terminal-output.error {
+            color: var(--neon-pink);
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+            margin-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step {
+            background: rgba(10, 10, 18, 0.7);
+            text-align: center;
+            padding: 50px 30px;
+            border-radius: 15px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 42, 109, 0.3);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .step:hover {
+            transform: translateY(-15px) rotateX(5deg);
+            box-shadow: 
+                0 0 40px rgba(0, 247, 255, 0.3),
+                0 0 80px rgba(255, 42, 109, 0.2);
+            border-color: var(--neon-cyan);
+        }
+        
+        .step::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple));
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .step:hover::before {
+            opacity: 0.3;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: var(--dark-matrix);
+            border: 2px solid var(--neon-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+        
+        .step-icon {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px var(--neon-cyan);
+            transition: var(--transition);
+        }
+        
+        .step:hover .step-icon {
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink);
+            transform: scale(1.1);
+        }
+        
+        .step h3 {
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: var(--text-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--text-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .step p {
+            color: #a0b0b8;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        /* Футер с картой */
+        footer {
+            background: var(--darker-void);
+            color: var(--text-glow);
+            padding: 100px 0 50px;
+            position: relative;
+            border-top: 1px solid rgba(255, 42, 109, 0.3);
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, 
+                    transparent, 
+                    rgba(211, 0, 197, 0.05), 
+                    transparent);
+            z-index: 0;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 60px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-col h3 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            bottom: -10px;
+            left: 0;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .footer-links li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+        
+        .footer-links a {
+            color: #a0b0b8;
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--neon-cyan);
+            padding-left: 10px;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .social-links {
+            display: flex;
+            margin-top: 40px;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            color: var(--text-glow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 247, 255, 0.3);
+            font-size: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .social-links a:hover {
+            background: rgba(255, 42, 109, 0.2);
+            color: var(--neon-pink);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 42, 109, 0.3);
+            border-color: var(--neon-pink);
+        }
+        
+        .social-links a::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent,
+                transparent,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent,
+                transparent,
+                transparent
+            );
+            transform: rotate(30deg);
+            animation: shine 6s infinite;
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 60px;
+            position: relative;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, 
+                    rgba(255, 42, 109, 0.1), 
+                    rgba(0, 247, 255, 0.1));
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .map-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background: var(--neon-pink);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 20px var(--neon-pink);
+            z-index: 2;
+        }
+        
+        .map-marker::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 50px;
+            border-top: 1px solid rgba(0, 247, 255, 0.3);
+            color: #6a7b85;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .copyright a {
+            color: var(--neon-green);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .copyright a:hover {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.7;
+                box-shadow: 0 0 5px currentColor;
+            }
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 20px currentColor;
+            }
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+            20% {
+                left: 100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+        
+        @keyframes logoHue {
+            0% {
+                filter: drop-shadow(0 0 15px var(--neon-pink)) hue-rotate(0deg);
+            }
+            100% {
+                filter: drop-shadow(0 0 15px var(--neon-pink)) hue-rotate(360deg);
+            }
+        }
+        
+        @keyframes holoPulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 0.1;
+                transform: scale(1.2);
+            }
+        }
+        
+        @keyframes btnPulse {
+            0% {
+                box-shadow: 0 0 30px rgba(255, 42, 109, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 42, 109, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(255, 42, 109, 0.8);
+            }
+        }
+        
+        @keyframes badgePulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes badgeFloat {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes linePulse {
+            0% {
+                width: 150px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 250px;
+                opacity: 1;
+            }
+        }
+        
+        @keyframes cellPulse {
+            0% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulseAnim {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+        
+        @keyframes rippleAnim {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 4rem;
+            }
+            
+            .section-title h2 {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .menu-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 80px);
+                background: var(--darker-void);
+                flex-direction: column;
+                padding: 40px 30px;
+                transition: var(--transition);
+                box-shadow: 2px 0 30px rgba(255, 42, 109, 0.3);
+                border-right: 1px solid var(--neon-pink);
+                z-index: 1000;
+            }
+            
+            nav.active {
+                left: 0;
+            }
+            
+            nav ul {
+                flex-direction: column;
+            }
+            
+            nav ul li {
+                margin: 25px 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero p {
+                font-size: 1.3rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                gap: 25px;
+            }
+            
+            .phone-btn, .tg-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.5rem;
+                letter-spacing: 3px;
+            }
+            
+            .section-title h2 {
+                font-size: 2.5rem;
+            }
+            
+            .menu-item-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .menu-item-price {
+                margin-top: 10px;
+            }
+            
+            .terminal {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ASCII лоадер -->
+    <div class="cyber-loader" id="cyberLoader">
+        <div class="loader-grid" id="loaderGrid"></div>
+        <div class="loader-text">ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ</div>
+        <div class="loader-progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+    
+    <!-- Шапка с голограммой -->
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-holo"></div>
+                    <img src="https://via.placeholder.com/50/ff2a6d/ffffff?text=NS3" alt="NEON SUSHI 3000">
+                    <span class="logo-text">NEON SUSHI 3000</span>
+                </a>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav id="nav">
+                    <ul>
+                        <li><a href="#home"><span>ГЛАВНАЯ</span></a></li>
+                        <li><a href="#menu"><span>НЕОН-МЕНЮ</span></a></li>
+                        <li><a href="#how-to-order"><span>АЛГОРИТМ</span></a></li>
+                        <li><a href="#contacts"><span>КОНТАКТЫ</span></a></li>
+                    </ul>
+                </nav>
+                
+                <a href="tel:+71234567890" class="order-btn">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>ЭКСТРЕННЫЙ ВЫЗОВ</span>
+                    <span class="badge">!</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Главный баннер с матрицей -->
+    <section class="hero" id="home">
+        <div class="matrix-rain" id="matrixRain"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>КВАНТОВАЯ ДОСТАВКА</h1>
+                <p>Синтетический лосось с цифровым рисом. Настоящий вкус в виртуальном мире.</p>
+                
+                <div class="cta-buttons">
+                    <a href="tel:+71234567890" class="phone-btn">
+                        <i class="fas fa-phone-alt"></i>
+                        +7 (123) 456-78-90
+                        <div class="pulse"></div>
+                    </a>
+                    
+                    <a href="https://t.me/neonsushi_bot" class="tg-btn" target="_blank">
+                        <i class="fab fa-telegram-plane"></i>
+                        NEON BOT 3000
+                        <div class="ripple"></div>
+                    </a>
+                </div>
+                
+                <a href="#menu" class="scroll-down">
+                    <span>SCROLL DOWN</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Меню с голографической проекцией -->
+    <section class="menu-section" id="menu">
+        <div class="holo-grid"></div>
+        <div class="container">
+            <div class="section-title">
+                <h2>НЕОН-МЕНЮ</h2>
+            </div>
+            
+            <div class="section-subtitle">
+                ВКЛЮЧИТЕ ГОЛОГРАФИЧЕСКИЙ ПРОЕКТОР ДЛЯ ПРОСМОТРА
+            </div>
+            
+            <div class="menu-grid">
+                <!-- Ролл 1 -->
+                <div class="menu-item">
+                    <span class="neon-badge">ХИТ 3000</span>
+                    <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Кибер-Филадельфия" class="menu-item-img">
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">
+                            <span>КИБЕР-ФИЛАДЕЛЬФИЯ</span>
+                            <span class="menu-item-price">₽450</span>
+                        </div>
+                        <p class="menu-item-desc">Синтетический лосось 3D-печати, крем-чипсы на основе нанотехнологий, кибер-огурец с блокчейн-фермы, бионический рис с квантовым послевкусием.</p>
+                        <div class="tech-specs">
+                            <span class="tech-spec">25% протеина</span>
+                            <span class="tech-spec">v3.0.1</span>
+                            <span class="tech-spec">AI approved</span>
+                        </div>
+                        <div class="order-methods">
+                            <span class="order-via">ТОЛЬКО ПРЯМОЙ ЗАКАЗ ЧЕРЕЗ ТЕРМИНАЛ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ролл 2 -->
+                <div class="menu-item">
+                    <span class="neon-badge">НОВАЯ ВЕРСИЯ</span>
+                    <img src="https://images.unsplash.com/photo-1617196035154-1e2b6ef1ce5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Неоновая Калифорния" class="menu-item-img">
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">
+                            <span>НЕОН-КАЛИФОРНИЯ</span>
+                            <span class="menu-item-price">₽420</span>
+                        </div>
+                        <p class="menu-item-desc">Краб-дрон с ИИ, голографический авокадо, квантовый огурец, икра тобико с эффектом неонового свечения, майонез на основе биотеха.</p>
+                        <div class="tech-specs">
+                            <span class="tech-spec">30% протеина</span>
+                            <span class="tech-spec">v2.7.3</span>
+                            <span class="tech-spec">Blockchain</span>
+                        </div>
+                        <div class="order-methods">
+                            <span class="order-via">ТОЛЬКО ПРЯМОЙ ЗАКАЗ ЧЕРЕЗ ТЕРМИНАЛ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ролл 3 -->
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1617196034189-5a6b234f0e50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Нейро-Унаги" class="menu-item-img">
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">
+                            <span>НЕЙРО-УНАГИ</span>
+                            <span class="menu-item-price">₽490</span>
+                        </div>
+                        <p class="menu-item-desc">Угорь с блокчейна, нано-сыр с квантовой текстурой, чипсовый огурец с NFT-сертификатом, соус унаги с алгоритмом машинного обучения.</p>
+                        <div class="tech-specs">
+                            <span class="tech-spec">35% протеина</span>
+                            <span class="tech-spec">v3.1.4</span>
+                            <span class="tech-spec">Neural network</span>
+                        </div>
+                        <div class="order-methods">
+                            <span class="order-via">ТОЛЬКО ПРЯМОЙ ЗАКАЗ ЧЕРЕЗ ТЕРМИНАЛ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Сет 1 -->
+                <div class="menu-item">
+                    <span class="neon-badge">КОМПЛЕКТ</span>
+                    <img src="https://images.unsplash.com/photo-1611143669185-af224c5e0102?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Кибер-сет" class="menu-item-img">
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">
+                            <span>КИБЕР-СЕТ 3000</span>
+                            <span class="menu-item-price">₽1499</span>
+                        </div>
+                        <p class="menu-item-desc">8 Кибер-Филадельфий, 8 Неоновых Калифорний, 4 нейро-нигири с квантовым лососем, 2 супа мисо с алгоритмом идеальной температуры.</p>
+                        <div class="tech-specs">
+                            <span class="tech-spec">40% протеина</span>
+                            <span class="tech-spec">v4.2.0</span>
+                            <span class="tech-spec">Quantum</span>
+                        </div>
+                        <div class="order-methods">
+                            <span class="order-via">ТОЛЬКО ПРЯМОЙ ЗАКАЗ ЧЕРЕЗ ТЕРМИНАЛ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Как заказать с терминалом -->
+    <section class="how-to-order" id="how-to-order">
+        <div class="container">
+            <div class="section-title">
+                <h2>АЛГОРИТМ ЗАКАЗА</h2>
+            </div>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                    </div>
+                    <div class="terminal-title">neon_sushi_terminal_v3.0.0</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-command">
+                        <div class="terminal-prompt">user@neonsushi:~$</div>
+                        <div>./init_order_sequence.sh</div>
+                        <div class="terminal-cursor"></div>
+                    </div>
+                    <div class="terminal-output success">
+                        > Инициализация последовательности заказа... УСПЕХ<br>
+                        > Подключение к нейросети... УСПЕХ<br>
+                        > Синхронизация с базой данных меню... УСПЕХ
+                    </div>
+                    <div class="terminal-command">
+                        <div class="terminal-prompt">user@neonsushi:~$</div>
+                        <div>select_delivery_method</div>
+                        <div class="terminal-cursor"></div>
+                    </div>
+                    <div class="terminal-output">
+                        > Доступные методы:<br>
+                        > 1. Голосовой вызов (рекомендуется)<br>
+                        > 2. Telegram-бот NEON BOT 3000<br>
+                        > 3. Экстренный нейроинтерфейс (требуется лицензия)
+                    </div>
+                    <div class="terminal-command">
+                        <div class="terminal-prompt">user@neonsushi:~$</div>
+                        <div>connect_operator --protocol=voice --number=+71234567890</div>
+                        <div class="terminal-cursor"></div>
+                    </div>
+                    <div class="terminal-output success">
+                        > Соединение установлено<br>
+                        > Оператор NEON SUSHI 3000 на линии<br>
+                        > Готов к приему вашего заказа
+                    </div>
+                </div>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>ВЫБОР</h3>
+                    <p>Активируйте голографическое меню и выберите желаемые позиции с помощью нейроинтерфейса или сенсорного управления.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h3>СВЯЗЬ</h3>
+                    <p>Инициируйте голосовое соединение с оператором NEON SUSHI 3000 по номеру +7 (123) 456-78-90 или через квантовый коммуникатор.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                    <h3>АЛЬТЕРНАТИВА</h3>
+                    <p>Альтернативно, отправьте заказ через Telegram-бота @neonsushi_bot, используя зашифрованный протокол NEON-3000.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>ДОСТАВКА</h3>
+                    <p>Ваш заказ будет доставлен дроном-курьером с гиперзвуковой скоростью в течение 30-47 минут (в зависимости от квантовых помех).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Футер с картой -->
+    <footer id="contacts">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>NEON SUSHI 3000</h3>
+                    <p>Квантовая доставка еды из будущего. Настоящие ингредиенты в цифровой матрице. Синтетический вкус, натуральные эмоции.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="https://t.me/neonsushi" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>КОНТАКТЫ</h3>
+                    <ul class="footer-links">
+                        <li><a href="tel:+71234567890"><i class="fas fa-phone-alt"></i> +7 (123) 456-78-90</a></li>
+                        <li><a href="mailto:quantum@neonsushi3000.ru"><i class="fas fa-envelope"></i> quantum@neonsushi3000.ru</a></li>
+                        <li><a href="https://t.me/neonsushi_bot" target="_blank"><i class="fab fa-telegram-plane"></i> @neonsushi_bot</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Кибер-улица, 3000</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>РЕЖИМ РАБОТЫ</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">24/7/365</a></li>
+                        <li><a href="#">Даже во время кибератак</a></li>
+                        <li><a href="#">Квантовые выходные: никогда</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div class="map-overlay"></div>
+                <div class="map-marker"></div>
+                <!-- Здесь будет карта -->
+                <img src="https://maps.googleapis.com/maps/api/staticmap?center=55.7558,37.6176&zoom=15&size=800x400&maptype=roadmap&markers=color:red%7C55.7558,37.6176&key=YOUR_API_KEY" alt="Карта" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 3000 NEON SUSHI QUANTUM NETWORK. Все права защищены. | <a href="#">Политика конфиденциальности</a> | <a href="#">Условия использования</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // ASCII лоадер
+        const loaderGrid = document.getElementById('loaderGrid');
+        const progressBar = document.getElementById('progressBar');
+        const cyberLoader = document.getElementById('cyberLoader');
+        
+        // Создаем сетку для лоадера
+        for (let i = 0; i < 200; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('loader-cell');
+            loaderGrid.appendChild(cell);
+        }
+        
+        // Анимация прогресс-бара
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 100) progress = 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // Случайные активные ячейки
+            const cells = document.querySelectorAll('.loader-cell');
+            cells.forEach(cell => {
+                if (Math.random() > 0.9) {
+                    cell.classList.add('active');
+                    setTimeout(() => cell.classList.remove('active'), 500);
+                }
+            });
+            
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                setTimeout(() => {
+                    cyberLoader.style.opacity = '0';
+                    setTimeout(() => {
+                        cyberLoader.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }, 100);
+        
+        // Матричный дождь
+        const matrixRain = document.getElementById('matrixRain');
+        const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+        
+        function createMatrix() {
+            const columns = Math.floor(window.innerWidth / 20);
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.top = '0';
+                column.style.left = `${i * 20}px`;
+                column.style.width = '20px';
+                column.style.height = '100%';
+                column.style.color = `hsl(${Math.random() * 120 + 150}, 100%, 50%)`;
+                column.style.fontFamily = 'monospace';
+                column.style.fontSize = '18px';
+                column.style.lineHeight = '20px';
+                column.style.textAlign = 'center';
+                column.style.opacity = '0.1';
+                matrixRain.appendChild(column);
+                
+                animateColumn(column);
+            }
+        }
+        
+        function animateColumn(column) {
+            let position = -100;
+            const speed = 2 + Math.random() * 5;
+            const length = 10 + Math.floor(Math.random() * 20);
+            
+            function move() {
+                position += speed;
+                if (position > window.innerHeight) {
+                    position = -length * 20;
+                    column.style.color = `hsl(${Math.random() * 120 + 150}, 100%, 50%)`;
+                }
+                
+                let text = '';
+                for (let i = 0; i < length; i++) {
+                    const y = position + i * 20;
+                    if (y >= 0 && y < window.innerHeight) {
+                        const charIndex = Math.floor(Math.random() * chars.length);
+                        text += chars[charIndex] + '<br>';
+                    } else {
+                        text += ' <br>';
+                    }
+                }
+                
+                column.innerHTML = text;
+                requestAnimationFrame(move);
+            }
+            
+            move();
+        }
+        
+        createMatrix();
+        
+        // Мобильное меню
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const nav = document.getElementById('nav');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            mobileMenuBtn.innerHTML = nav.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+        
+        // Плавная прокрутка
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.getAttribute('href') === '#') return;
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Закрываем меню на мобильных
+                    if (nav.classList.contains('active')) {
+                        nav.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+        
+        // Фиксированная шапка при скролле
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+        
+        // Анимация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.step, .menu-item');
+            
+            animatedElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 150 * index);
+            });
+        });
+        
+        // Случайные мерцания
+        setInterval(() => {
+            const randomElements = document.querySelectorAll('.menu-item, .step');
+            randomElements.forEach(el => {
+                if (Math.random() > 0.95) {
+                    el.style.boxShadow = `0 0 ${20 + Math.random() * 30}px rgba(${Math.random() > 0.5 ? '0, 247, 255' : '255, 42, 109'}, ${0.2 + Math.random() * 0.3})`;
+                    setTimeout(() => {
+                        el.style.boxShadow = '';
+                    }, 300);
+                }
+            });
+        }, 500);
+    </script>
+</body>
+</html>
